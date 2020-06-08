@@ -67,7 +67,7 @@ def create_grid():
     win.fill(GREY)
     pg.display.set_caption("Minesweeper")
     font = pg.font.SysFont('Arial', 25)
-    IMAGE = pg.image.load("pngflow.com.png")
+    IMAGE = pg.image.load("bomb.png")
     rect2 = IMAGE.get_rect()
     clickable = True
     done = False
