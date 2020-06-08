@@ -12,7 +12,7 @@ GREEN = (0, 128, 0)
 PURPLE = (128, 0, 128)
 BOARD_SIZE = 10
 
-colors = {1:RED, 2:BLUE, 3:GREEN}
+colors = {1:RED, 2:BLUE, 3:GREEN, 4:WHITE}
 random.seed(1)
 
 def init_board():
@@ -31,12 +31,12 @@ def init_nums():
         for col in range(len(board)):
             if board[row][col] != 9:
                 if row !=0:
+                    if board[row - 1][col] == 9:
+                        board[row][col] += 1
 
                     if col != 0:
                         if board[row-1][col-1] == 9:
                             board[row][col]+=1
-                    if board[row - 1][col] == 9:
-                        board[row][col] += 1
                     if col != 9:
                         if board[row - 1][col + 1] == 9:
                             board[row][col] += 1
@@ -69,8 +69,10 @@ def create_grid():
     win.fill(GREY)
     pg.display.set_caption("Minesweeper")
     font = pg.font.SysFont('Arial', 25)
-    IMAGE = pg.image.load("bomb.png")
-    rect2 = IMAGE.get_rect()
+    BOMB_IMG = pg.image.load("bomb.png")
+    FLAG_IMG = pg.image.load("flag.png")
+    rect2 = BOMB_IMG.get_rect()
+    rect3 = FLAG_IMG.get_rect()
     clickable = True
     done = False
 
@@ -84,13 +86,16 @@ def create_grid():
         for event in pg.event.get():
             if clickable and event.type == pg.MOUSEBUTTONDOWN:
                 Mouse_x, Mouse_y = pg.mouse.get_pos()
-                if board[Mouse_y //20 ][Mouse_x//20] != 9 and board[Mouse_y //20 ][Mouse_x//20] != 0:
-                   render_num(win,font, board[Mouse_y //20 ][Mouse_x//20],
-                              colors[board[Mouse_y //20][Mouse_x//20]], Mouse_x, Mouse_y)
-                if board[Mouse_y //20 ][Mouse_x//20] == 9:
-                    win.blit(IMAGE, (Mouse_x//20 * 20, Mouse_y//20 * 20), rect2)
-                    clickable= False
-                    pg.display.set_caption("You lost!")
+                if event.button == 1:
+                    if board[Mouse_y //20 ][Mouse_x//20] != 9 and board[Mouse_y //20 ][Mouse_x//20] != 0:
+                       render_num(win,font, board[Mouse_y //20 ][Mouse_x//20],
+                                  colors[board[Mouse_y //20][Mouse_x//20]], Mouse_x, Mouse_y)
+                    if board[Mouse_y //20 ][Mouse_x//20] == 9:
+                        win.blit(BOMB_IMG, (Mouse_x//20 * 20, Mouse_y//20 * 20), rect2)
+                        clickable= False
+                        pg.display.set_caption("You lost!")
+                if event.button == 3:
+                    win.blit(FLAG_IMG, (Mouse_x // 20 * 20 + 3 , Mouse_y // 20 * 20 +3), rect3)
             if event.type == pg.QUIT:
                 done = True
         pg.display.update() #update display
@@ -99,7 +104,7 @@ def create_grid():
     sys.exit()
 
 def render_num(screen, font, num, color, mouse_x, mouse_y):
-    screen.blit(font.render(str(num), True, color), (mouse_x // 20 * 20, mouse_y // 20 * 20))
+    screen.blit(font.render(str(num), True, color), (mouse_x // 20 * 20+3, mouse_y // 20 * 20+3))
 
 
 if __name__ == "__main__":
