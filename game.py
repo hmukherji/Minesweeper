@@ -9,6 +9,9 @@ WIDTH = 200
 GREY = (128,128,128) #rgb value
 WHITE = (200,200,200)
 RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+GREEN = (0, 128, 0)
+PURPLE = (128, 0, 128)
 
 def init_board():
     board = [[0] * 10 for _ in range(10)]
@@ -64,18 +67,30 @@ def create_grid():
     win = pg.display.set_mode((HEIGHT, WIDTH))
     win.fill(GREY)
     pg.display.set_caption("Minesweeper")
+    font = pg.font.SysFont('Arial', 25)
 
     done = False
     while not done:
-        for x in range(10):
-            for y in range(10):
+        for y in range(10):
+            for x in range(10):
                 rectColor = WHITE
                 rect = pg.Rect(x * square_size, y * square_size, square_size, square_size)
                 if board[x][y]==9:
                     rectColor=RED
                     pg.draw.rect(win, rectColor, rect, 0)
-                pg.draw.rect(win, rectColor, rect, 1)
+                if board[x][y]==1:
+                    win.blit(font.render('1', True, RED),(x*square_size, y*square_size) )
+
+                if board[x][y]==2:
+                    win.blit(font.render('2', True, BLUE), (x * square_size, y * square_size))
+                if board[x][y] == 3:
+                    win.blit(font.render('3', True, PURPLE), (x * square_size, y * square_size))
+                else:
+                    pg.draw.rect(win, rectColor, rect, 1)
         for event in pg.event.get():
+            # if event.type == pg.MOUSEBUTTONUP:
+            #
+            #
             if event.type == pg.QUIT:
                 done = True
         pg.display.update() #update display
