@@ -5,10 +5,10 @@ import pygame as pg
 
 #random.seed(1)
 HEIGHT = 200 #window dimensions
-WIDTH = 200 #window dimensions
+WIDTH = 200
 GREY = (128,128,128) #rgb value
-WHITE = (200,200,200) #rgb value
-BLACK = (255, 0, 0)
+WHITE = (200,200,200)
+RED = (255, 0, 0)
 
 def init_board():
     board = [[0] * 10 for _ in range(10)]
@@ -72,7 +72,7 @@ def create_grid():
                 rectColor = WHITE
                 rect = pg.Rect(x * square_size, y * square_size, square_size, square_size)
                 if board[x][y]==9:
-                    rectColor=BLACK
+                    rectColor=RED
                     pg.draw.rect(win, rectColor, rect, 0)
                 pg.draw.rect(win, rectColor, rect, 1)
         for event in pg.event.get():
