@@ -20,7 +20,7 @@ WIDTH = HEIGHT = BOARD_SIZE * 20 #window dimensions
 NUM_BOMBS = 40
 
 
-colors = {1:RED, 2:BLUE, 3:GREEN, 4:PURPLE,5:MAGENTA,6:ORANGE,7:YELLOW,8:BLACK}
+colors = [RED, BLUE, GREEN, PURPLE, MAGENTA, ORANGE, YELLOW, BLACK]
 #random.seed(1)
 
 def init_board():
@@ -111,7 +111,7 @@ def create_grid():
                         #     moveable=True
                         #     create_grid()
 
-                if event.button == 3 and board[Mouse_y // 20][Mouse_x // 20] not in list(colors.keys()):
+                if event.button == 3 and board[Mouse_y // 20][Mouse_x // 20] not in range(len(colors)):
                     if board[Mouse_y // 20][Mouse_x // 20] == 9:
                         found+=1
                     # if (Mouse_x, Mouse_y) not in called:
