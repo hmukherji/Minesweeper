@@ -15,9 +15,9 @@ MAGENTA = (255,0,255)
 ORANGE = (255, 165, 0)
 YELLOW = (255,255,0)
 BLACK = (0,0,0)
-BOARD_SIZE = 20
+BOARD_SIZE = 8
 WIDTH = HEIGHT = BOARD_SIZE * 20 #window dimensions
-NUM_BOMBS = 40
+NUM_BOMBS = 5
 
 
 colors = [RED, BLUE, GREEN, PURPLE, MAGENTA, ORANGE, YELLOW, BLACK]
@@ -101,25 +101,13 @@ def create_grid():
                         moveable= False
                         pg.display.set_caption("You lost!")
                         lost = True
-                        # rect5 = pg.Rect(0, 0, SQUARE_SIZE*10, SQUARE_SIZE*2)
-                        # pg.draw.rect(win, WHITE, rect5, 0)
-                        # win.fill(WHITE)
-                        # win.blit(font.render("Play again?", True, BLACK), (0,0))
-                        # win.blit(font.render("Yes", True, GREEN), (100, 0))
-                        # win.blit(font.render("No", True, RED), (150, 0))
-                        # if 100<Mouse_x<140 and 0<Mouse_y<50:
-                        #     moveable=True
-                        #     create_grid()
 
                 if event.button == 3 and board[Mouse_y // 20][Mouse_x // 20] not in range(len(colors)):
                     if board[Mouse_y // 20][Mouse_x // 20] == 9:
                         found+=1
-                    # if (Mouse_x, Mouse_y) not in called:
                     called.append((Mouse_x, Mouse_y))
                     display_img(win, FLAG_IMG, Mouse_x, Mouse_y, rect3)
-                    # else:
-                    #     rect5 = pg.Rect(Mouse_x//20 * 20, Mouse_y//20 * 20, SQUARE_SIZE, SQUARE_SIZE)
-                    #     pg.draw.rect(win, WHITE, rect5, 0)
+
             if found == NUM_BOMBS and not any(0 in x for x in board):
                 moveable = False
                 pg.display.set_caption("You won!")
