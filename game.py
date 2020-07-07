@@ -19,32 +19,28 @@ BOARD_SIZE = 8
 WIDTH = HEIGHT = BOARD_SIZE * 20 #window dimensions
 NUM_BOMBS = 5
 
-
 colors = [RED, BLUE, GREEN, PURPLE, MAGENTA, ORANGE, YELLOW, BLACK]
-#random.seed(1)
+
+class Mouse:
+    def __init__(self):
+        self.xpos = pg.mouse.get_pos()[0]
+        self.ypos = pg.mouse.get_pos()[1]
+
+        self.board_xpos = self.xpos // 20
+        self.board_ypos = self.ypos // 20
 
 def init_board():
     board = [[0] * BOARD_SIZE for _ in range(BOARD_SIZE)]
     for i in range(NUM_BOMBS):
-        #while count(board) < 40:
             row = random.randint(1, BOARD_SIZE-1)
             column = random.randint(1, BOARD_SIZE-1)
             board[row][column] = 9
-    # print(np.array(board))
-    # print("\n")
+
     return board
 
-def count(board):
-    ret = 0
-    for row in board[0]:
-        for col in board:
-            if board[row][col]==9:
-                print(board[row][j])
-                ret+=1
-    return ret
-
-def create_grid():
+def run():
     board = init_board()
+    mouse = Mouse()
     pg.init()
     SQUARE_SIZE = 20
     win = pg.display.set_mode((HEIGHT, WIDTH))
@@ -57,7 +53,7 @@ def create_grid():
     rect3 = FLAG_IMG.get_rect()
     moveable = True
     done = False
-    lost = False
+
     called = [[]]
     found = 0
 
@@ -71,58 +67,32 @@ def create_grid():
     while not done:
         for event in pg.event.get():
             if moveable and event.type == pg.MOUSEBUTTONDOWN:
-                Mouse_x, Mouse_y = pg.mouse.get_pos()
-                print(np.array(board))
                 if event.button == 1:
-                    if board[Mouse_y // 20][Mouse_x // 20] != 9:
-                        board = uncover_squares(board, [Mouse_y // 20, Mouse_x // 20])
-                        # print(np.array(board))
-
-                        for row in range(len(board)):
-                            for col in range(len(board)):
-                                if board[row][col] != 0 and board[row][col] != 9:
-                                    if board[row][col]==-1:
-                                        rect4 = pg.Rect(col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
-                                        pg.draw.rect(win, WHITE, rect4, 0)
-                                    else:
-                                        rect4 = pg.Rect(col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
-                                        pg.draw.rect(win, WHITE, rect4, 0)
-                                        render_num(win, font, board[row][col],
-                                                   colors[board[row][col]], col*20, row*20)
-
-                        if board[Mouse_y // 20][Mouse_x // 20] != -1:
-                            rect6 = pg.Rect(Mouse_x//20 * 20, Mouse_y//20 * 20, SQUARE_SIZE, SQUARE_SIZE)
-
-                            render_num(win,font, board[Mouse_y //20 ][Mouse_x//20], colors[board[Mouse_y //20][Mouse_x//20]], Mouse_x, Mouse_y)
-
-                            #pg.draw.rect(win, DARKGREY, rect6, 0)
-                    if board[Mouse_y //20 ][Mouse_x//20] == 9:
-                        display_img(win, BOMB_IMG, Mouse_x, Mouse_y, rect2)
+                    fill_square(mouse, board, SQUARE_SIZE, win, font)
+                    if board[mouse.board_ypos ][mouse.board_xpos] == 9:
+                        display_img(win, BOMB_IMG, mouse.xpos, mouse.ypos, rect2)
                         moveable= False
                         pg.display.set_caption("You lost!")
-                        lost = True
 
-                if event.button == 3 and board[Mouse_y // 20][Mouse_x // 20] not in range(len(colors)):
-                    if board[Mouse_y // 20][Mouse_x // 20] == 9:
-                        found+=1
-                    called.append((Mouse_x, Mouse_y))
-                    display_img(win, FLAG_IMG, Mouse_x, Mouse_y, rect3)
+                if event.button == 3 and board[mouse.board_ypos][mouse.board_xpos] not in range(len(colors)):
+                    if board[mouse.board_ypos][mouse.board_xpos] == 9:
+                        found += 1
+                    called.append((mouse.xpos, mouse.ypos))
+                    display_img(win, FLAG_IMG, mouse.xpos, mouse.ypos, rect3)
 
             if found == NUM_BOMBS and not any(0 in x for x in board):
                 moveable = False
                 pg.display.set_caption("You won!")
             if moveable==False and event.type == pg.KEYDOWN and event.key == pg.K_y:
-                print("ok")
-                create_grid()
+                run()
             if event.type == pg.QUIT:
                 done = True
         pg.display.update() #update display
-
     pg.quit()
     sys.exit()
 
 def render_num(screen, font, num, color, mouse_x, mouse_y):
-        screen.blit(font.render(str(num), True, color), (mouse_x // 20 * 20, mouse_y // 20 * 20))
+        screen.blit(font.render(str(num), True, color), (mouse_x//20 * 20, mouse_y//20 * 20))
 
 def display_img(screen, img, mouse_x, mouse_y, rect):
     screen.blit(img, (mouse_x//20 * 20, mouse_y//20 * 20), rect)
@@ -142,12 +112,31 @@ def uncover(i, j, m, n, board, neighbors):
             mine_count += 1
     if mine_count == 0:
         board[i][j] = -1
+        for cell in neighbors:
+            if 0 <= i + cell[0] < m and 0 <= j + cell[1] < n:
+                uncover(i + cell[0], j + cell[1], m, n, board, neighbors)  # call neighbors
     else:
         board[i][j] = mine_count
-        return
-    for cell in neighbors:
-        if 0 <= i + cell[0] < m and 0 <= j + cell[1] < n:
-            uncover(i + cell[0], j + cell[1], m, n, board, neighbors) #call neighbors
+
+def fill_square(mouse, board, square_size, win, font):
+    if board[mouse.board_ypos][mouse.board_xpos] != 9:
+        board = uncover_squares(board, [mouse.board_ypos, mouse.board_xpos])
+
+        for row in range(len(board)):
+            for col in range(len(board)):
+                if board[row][col] != 0 and board[row][col] != 9:
+                    if board[row][col] == -1:
+                        rect4 = pg.Rect(col * square_size, row * square_size, square_size, square_size)
+                        pg.draw.rect(win, WHITE, rect4, 0)
+                    else:
+                        rect4 = pg.Rect(col * square_size, row * square_size, square_size, square_size)
+                        pg.draw.rect(win, WHITE, rect4, 0)
+                        render_num(win, font, board[row][col],
+                                   colors[board[row][col]], col * 20, row * 20)
+
+        if board[mouse.board_ypos][mouse.board_xpos] != -1:
+            render_num(win, font, board[mouse.board_ypos][mouse.board_xpos],
+                       colors[board[mouse.board_ypos][mouse.board_xpos]], mouse.xpos, mouse.ypos)
 
 if __name__ == "__main__":
-    create_grid()
+    run()
